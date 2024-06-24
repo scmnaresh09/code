@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project>
+	<description>
+        Macrodefs and Targetes for Cobertura code coverage.
+    </description>
+
+	<path id="cobertura.classpath">
+		<fileset dir="${cobertura.root}">
+			<include name="cobertura.jar" />
+			<include name="lib/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
+	<macrodef name="_instrument" description="instruments the classes">
+		<attribute name="from.dir" />
+		<attribute name="to.dir" />
+		<attribute name="cobertura.output.dir" />
+		<attribute name="exclude.pattern" default="" />
+		<sequential>
+			<cobertura-instrument todir="@{to.dir}" datafile="@{cobertura.output.dir}/cobertura.ser">
+				<fileset dir="@{from.dir}">
+					<include name="**/*.class" />
+					<exclude name="@{exclude.pattern}" />
+				</fileset>
+			</cobertura-instrument>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="_coverage-report">
+		<attribute name="cobertura.output.dir" />
+		<attribute name="src.dir" />
+		<attribute name="test.dir" />
+		<sequential>
+			<cobertura-report datafile="@{cobertura.output.dir}/cobertura.ser" destdir="@{cobertura.output.dir}">
+				<fileset dir="@{src.dir}" includes="**/*.java" />
+				<fileset dir="@{test.dir}" includes="**/*.java" />
+			</cobertura-report>
+		</sequential>
+	</macrodef>
+
+	<target name="instrumentation" if="doInstrument">
+		<_instrument from.dir="${classes.dir}" to.dir="${classes.dir}" cobertura.output.dir="${cobertura.results.dir}" />
+	</target>
+
+	<target name="coverage-report" if="doInstrument">
+		<_coverage-report cobertura.output.dir="${cobertura.results.dir}" src.dir="${src.java.dir}" test.dir="${src.test.dir}" />
+	</target>
+
+	<target name="copy-coverage-jar" if="doInstrument">
+		<copy file="${cobertura.root}/cobertura.jar" todir="${war.build.dir}/WEB-INF/lib" flatten="true"/>
+	</target>
+
+</project>
