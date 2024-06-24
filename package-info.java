@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 
-/** Contains {@link ai.djl.translate.Transform}s for working with Images. */
-package ai.djl.modality.cv.transform;
+/** Contains utility classes for reinforcement learning. */
+package ai.djl.modality.rl;
